@@ -1,4 +1,4 @@
-Google Places API java source implemented for query purpose.
+Existing Google Places API java source implemented for a special query purpose.
 
 Setup
 =====
