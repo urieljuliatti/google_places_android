@@ -7,7 +7,7 @@ public abstract class Query {
 	protected QueryBuilder mQueryBuilder = new QueryBuilder();
 	
 	public Query() {
-		setSensor(false); // Default
+		setSensor(false); // Sensor defined as default
 	}
 	
 	public void setSensor(boolean sensor) {

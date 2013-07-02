@@ -18,7 +18,7 @@ public class Place implements Parcelable {
 	private double mLongitude = 0;
 	//private double mRating = 0;
 	private String mReference = "";
-
+	private String mId = "";
 	private PlaceDetails mDetails;
 	
 	private Place(Parcel in) {
@@ -37,6 +37,7 @@ public class Place implements Parcelable {
 			mLatitude = jsonPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
 			mLongitude = jsonPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
 			//mRating = jsonPlace.getDouble("rating");
+			setmId(jsonPlace.getString("id"));
 			mReference = jsonPlace.getString("reference");
 			
 			if (jsonPlace.has("vicinity")) {
@@ -129,6 +130,14 @@ public class Place implements Parcelable {
 		out.writeParcelable(mDetails, flags);
 	}
 	
+	public String getmId() {
+		return mId;
+	}
+
+	public void setmId(String mId) {
+		this.mId = mId;
+	}
+
 	public static final Parcelable.Creator<Place> CREATOR = new Parcelable.Creator<Place>() {
 
 		public Place createFromParcel(Parcel in) {

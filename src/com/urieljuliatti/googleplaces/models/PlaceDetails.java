@@ -25,7 +25,6 @@ public class PlaceDetails implements Parcelable {
 	}
 
 	private PlaceDetails() {
-		// Do nothing.  For returning an empty object when a place has no details.
 	}
 	
 	public PlaceDetails(JSONObject jsonDetail) {

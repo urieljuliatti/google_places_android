@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
@@ -30,58 +31,59 @@ public class GooglePlaces {
 
 	private String mApiKey = "";
 	private AbstractSet<String> mSupportedPlaces;
-	
+
 	public GooglePlaces(String apiKey) {
 		mApiKey = apiKey;
 		loadSupportedPlaces();
 	}
 	
+
 	public PlacesResult getPlaces(List<String> types, String keyword, int radius, double lat, double lon) 
 			throws JSONException, ClientProtocolException, IOException {
 		NearbySearchQuery query = new NearbySearchQuery(radius, lat, lon);
 		query.setRadius(radius);
-		
+
 		if (types != null) {
 			for(String type : types){
 				query.addType(type);
 			}
 		}
-		
+
 		if (keyword != null && keyword != "") {
 			query.setKeyword(keyword);
 		}
-		
+
 		PlacesResult result = getPlaces(query);
-		
+
 		return result;
 	}
-	
+
 	public PlacesResult getPlaces(List<String> types, int radius, double lat, double lon) 
 			throws ClientProtocolException, JSONException, IOException {
 		return getPlaces(types, null, radius, lat, lon);
 	}
-	
+
 	public PlacesResult getPlacesNearby(int radius, double lat, double lon) 
 			throws ClientProtocolException, JSONException, IOException {
 		NearbySearchQuery query = new NearbySearchQuery(radius, lat, lon);
 		query.setRadius(radius);
 		query.setSensor(true);
 		PlacesResult result = getPlaces(query);
-		
+
 		return result;
 	}
-	
+
 	public PlacesResult getPlaces(String type, String keyword, int radius, double lat, double lon) 
 			throws ClientProtocolException, JSONException, IOException {
 		List<String> types = Arrays.asList(type);
 		return getPlaces(types, keyword, radius, lat, lon);
 	}
-	
+
 	public PlacesResult getPlaces(String type, int radius, double lat, double lon)
 			throws ClientProtocolException, JSONException, IOException {
 		return getPlaces(type, null, radius, lat, lon);
 	}
-	
+
 	public PlacesResult getPlaces(String searchText, double lat, double lon) 
 			throws ClientProtocolException, JSONException, IOException {
 		TextSearchQuery query = new TextSearchQuery(searchText);
@@ -89,7 +91,7 @@ public class GooglePlaces {
 		PlacesResult result = getPlaces(query);		
 		return result;
 	}
-	
+
 	public PlacesResult getPlacesSearchText(String searchText, int radius, double lat, double lon) 
 			throws ClientProtocolException, JSONException, IOException {
 		TextSearchQuery query = new TextSearchQuery(searchText);
@@ -100,15 +102,30 @@ public class GooglePlaces {
 		PlacesResult result = getPlaces(query);		
 		return result;
 	}
-	
+
+	public PlacesResult getPlacesSearchTextWithType(String searchText, int radius, double lat, double lon) 
+			throws ClientProtocolException, JSONException, IOException {
+		TextSearchQuery query = new TextSearchQuery(searchText);
+		query.setLocation(lat, lon);
+		query.setRadius(radius);
+		query.setLanguage("ptbr");
+		query.setSensor(true);
+		for(String type : mSupportedPlaces){
+			type = type + "|";
+			query.addType(type);
+		}
+		
+		PlacesResult result = getPlaces(query);		
+		return result;
+	}
+
 	public PlacesResult getPlaces(String searchText) 
 			throws ClientProtocolException, JSONException, IOException {
 		TextSearchQuery query = new TextSearchQuery(searchText);
 		PlacesResult result = getPlaces(query);
-		
 		return result;
 	}
-	
+
 
 	public PlacesResult getPlaces(Query query) 
 			throws JSONException, ClientProtocolException, IOException {
@@ -117,15 +134,15 @@ public class GooglePlaces {
 
 		return result;
 	}
-	
+
 	public DetailsResult getPlaceDetails(String reference) 
 			throws JSONException, ClientProtocolException, IOException {
 		DetailsQuery query = new DetailsQuery(reference);
 		DetailsResult result = getPlaceDetails(query);
-		
+
 		return result;
 	}
-	
+
 	public DetailsResult getPlaceDetails(Query query) 
 			throws JSONException, ClientProtocolException, IOException {
 		JSONObject response = executeRequest(query.toString());
@@ -137,25 +154,32 @@ public class GooglePlaces {
 	public boolean isSupportedPlace(String placeType) {
 		return (mSupportedPlaces.contains(placeType));
 	}
-	
+
 	private JSONObject executeRequest(String query) 
 			throws ClientProtocolException, IOException, JSONException {
 		query += "key=" + mApiKey;
-		
+
 		HttpClient client = new DefaultHttpClient();
 		HttpGet request = new HttpGet(query);
 
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String response = client.execute(request, handler);
 		JSONObject jsonResponse = new JSONObject(response);
-		
+
 		return jsonResponse;
 	}
-	
-	
+
+	// UsingCustom Supported Places
+	public void customSupportedPlaces(String args[]){
+		mSupportedPlaces.clear();
+		for(int i = 0; i < args.length; i++){
+			mSupportedPlaces.add(args[i]);
+		}
+	}
+
 	private void loadSupportedPlaces() {
 		mSupportedPlaces = new HashSet<String>();
-		
+
 		mSupportedPlaces.add("accounting");
 		mSupportedPlaces.add("airport");
 		mSupportedPlaces.add("amusement park");

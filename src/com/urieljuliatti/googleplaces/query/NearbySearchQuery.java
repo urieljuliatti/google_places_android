@@ -14,7 +14,7 @@ public class NearbySearchQuery extends SearchQuery {
 
 	public NearbySearchQuery(int radius, double lat, double lon) {
 		setLocation(lat, lon);
-		setRadius(radius); // Default
+		setRadius(radius); // Default radius option
 	}
 	
 	public void setRanking(Ranking ranking)	{
